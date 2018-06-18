@@ -81,6 +81,7 @@ export default class GooglePlacesAutocomplete extends Component {
   constructor (props) {
     super(props);
     this.state = this.getInitialState.call(this);
+    console.log('CHARLIE: CALLING URL', this.props.url)
   }
 
   getInitialState = () => ({
@@ -273,8 +274,8 @@ export default class GooglePlacesAutocomplete extends Component {
           }
         }
       };
-
-      request.open('GET', 'https://maps.googleapis.com/maps/api/place/details/json?' + Qs.stringify({
+      console.log('CHARLIE: GOOGLE URL', this.props.url)
+      request.open('GET', this.props.url + '/place/details/json?' + Qs.stringify({
         key: this.props.query.key,
         placeid: rowData.place_id,
         language: this.props.query.language,
@@ -414,15 +415,16 @@ export default class GooglePlacesAutocomplete extends Component {
       };
 
       let url = '';
+      console.log('CHARLIE: GOOGLE URL', this.props.url)
       if (this.props.nearbyPlacesAPI === 'GoogleReverseGeocoding') {
         // your key must be allowed to use Google Maps Geocoding API
-        url = 'https://maps.googleapis.com/maps/api/geocode/json?' + Qs.stringify({
+        url = this.props.url + '/geocode/json?' + Qs.stringify({
           latlng: latitude + ',' + longitude,
           key: this.props.query.key,
           ...this.props.GoogleReverseGeocodingQuery,
         });
       } else {
-        url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?' + Qs.stringify({
+        url = this.props.url + '/place/nearbysearch/json?' + Qs.stringify({
           location: latitude + ',' + longitude,
           key: this.props.query.key,
           ...this.props.GooglePlacesSearchQuery,
@@ -457,6 +459,7 @@ export default class GooglePlacesAutocomplete extends Component {
 
         if (request.status === 200) {
           const responseJSON = JSON.parse(request.responseText);
+          console.log('CHARLIE: REQUEST RESPONSE', responseJSON)
           if (typeof responseJSON.predictions !== 'undefined') {
             if (this._isMounted === true) {
               const results = this.props.nearbyPlacesAPI === 'GoogleReverseGeocoding'
@@ -474,9 +477,11 @@ export default class GooglePlacesAutocomplete extends Component {
           }
         } else {
           // console.warn("google places autocomplete: request could not be completed or has been aborted");
+          console.log('CHARLIE: RESPONSE', request.responseText)
         }
       };
-      request.open('GET', 'https://maps.googleapis.com/maps/api/place/autocomplete/json?&input=' + encodeURIComponent(text) + '&' + Qs.stringify(this.props.query));
+      console.log('CHARLIE: GOOGLE URL', this.props.url)
+      request.open('GET', this.props.url + '/place/autocomplete/json?&input=' + encodeURIComponent(text) + '&' + Qs.stringify(this.props.query));
       if (this.props.query.origin !== null) {
          request.setRequestHeader('Referer', this.props.query.origin)
       }
@@ -747,7 +752,8 @@ GooglePlacesAutocomplete.propTypes = {
   textInputHide: PropTypes.bool,
   suppressDefaultStyles: PropTypes.bool,
   numberOfLines: PropTypes.number,
-  onSubmitEditing: PropTypes.func
+  onSubmitEditing: PropTypes.func,
+  url: PropTypes.string
 }
 GooglePlacesAutocomplete.defaultProps = {
   placeholder: 'Search',
@@ -792,7 +798,8 @@ GooglePlacesAutocomplete.defaultProps = {
   textInputHide: false,
   suppressDefaultStyles: false,
   numberOfLines: 1,
-  onSubmitEditing: () => {}
+  onSubmitEditing: () => {},
+  url: 'https://maps.googleapis.com'
 }
 
 // this function is still present in the library to be retrocompatible with version < 1.1.0
