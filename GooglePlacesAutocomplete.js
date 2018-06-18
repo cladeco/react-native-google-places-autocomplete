@@ -81,7 +81,6 @@ export default class GooglePlacesAutocomplete extends Component {
   constructor (props) {
     super(props);
     this.state = this.getInitialState.call(this);
-    console.log('CHARLIE: CALLING URL', this.props.url)
   }
 
   getInitialState = () => ({
@@ -274,7 +273,7 @@ export default class GooglePlacesAutocomplete extends Component {
           }
         }
       };
-      console.log('CHARLIE: GOOGLE URL', this.props.url)
+
       request.open('GET', this.props.url + '/place/details/json?' + Qs.stringify({
         key: this.props.query.key,
         placeid: rowData.place_id,
@@ -415,7 +414,7 @@ export default class GooglePlacesAutocomplete extends Component {
       };
 
       let url = '';
-      console.log('CHARLIE: GOOGLE URL', this.props.url)
+
       if (this.props.nearbyPlacesAPI === 'GoogleReverseGeocoding') {
         // your key must be allowed to use Google Maps Geocoding API
         url = this.props.url + '/geocode/json?' + Qs.stringify({
@@ -459,7 +458,7 @@ export default class GooglePlacesAutocomplete extends Component {
 
         if (request.status === 200) {
           const responseJSON = JSON.parse(request.responseText);
-          console.log('CHARLIE: REQUEST RESPONSE', responseJSON)
+
           if (typeof responseJSON.predictions !== 'undefined') {
             if (this._isMounted === true) {
               const results = this.props.nearbyPlacesAPI === 'GoogleReverseGeocoding'
@@ -477,10 +476,9 @@ export default class GooglePlacesAutocomplete extends Component {
           }
         } else {
           // console.warn("google places autocomplete: request could not be completed or has been aborted");
-          console.log('CHARLIE: RESPONSE', request.responseText)
         }
       };
-      console.log('CHARLIE: GOOGLE URL', this.props.url)
+
       request.open('GET', this.props.url + '/place/autocomplete/json?&input=' + encodeURIComponent(text) + '&' + Qs.stringify(this.props.query));
       if (this.props.query.origin !== null) {
          request.setRequestHeader('Referer', this.props.query.origin)
