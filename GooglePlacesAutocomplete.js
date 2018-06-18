@@ -81,6 +81,7 @@ export default class GooglePlacesAutocomplete extends Component {
   constructor (props) {
     super(props);
     this.state = this.getInitialState.call(this);
+    console.log('CHARLIE: CALLING URL', this.props.url)
   }
 
   getInitialState = () => ({
@@ -278,7 +279,6 @@ export default class GooglePlacesAutocomplete extends Component {
           }
         }
       };
-
       request.open('GET', this.props.url + '/place/details/json?' + Qs.stringify({
         key: this.props.query.key,
         placeid: rowData.place_id,
@@ -423,7 +423,6 @@ export default class GooglePlacesAutocomplete extends Component {
       };
 
       let url = '';
-
       if (this.props.nearbyPlacesAPI === 'GoogleReverseGeocoding') {
         // your key must be allowed to use Google Maps Geocoding API
         url = this.props.url + '/geocode/json?' + Qs.stringify({
@@ -467,7 +466,6 @@ export default class GooglePlacesAutocomplete extends Component {
 
         if (request.status === 200) {
           const responseJSON = JSON.parse(request.responseText);
-
           if (typeof responseJSON.predictions !== 'undefined') {
             if (this._isMounted === true) {
               const results = this.props.nearbyPlacesAPI === 'GoogleReverseGeocoding'
@@ -489,9 +487,9 @@ export default class GooglePlacesAutocomplete extends Component {
           }
         } else {
           // console.warn("google places autocomplete: request could not be completed or has been aborted");
+          console.log('CHARLIE: RESPONSE', request.responseText)
         }
       };
-
       request.open('GET', this.props.url + '/place/autocomplete/json?&input=' + encodeURIComponent(text) + '&' + Qs.stringify(this.props.query));
       if (this.props.query.origin !== null) {
          request.setRequestHeader('Referer', this.props.query.origin)
@@ -767,6 +765,7 @@ GooglePlacesAutocomplete.propTypes = {
   onSubmitEditing: PropTypes.func,
   url: PropTypes.string
   editable: PropTypes.bool
+  url: PropTypes.string
 }
 GooglePlacesAutocomplete.defaultProps = {
   placeholder: 'Search',
@@ -814,6 +813,7 @@ GooglePlacesAutocomplete.defaultProps = {
   onSubmitEditing: () => {},
   url: 'https://maps.googleapis.com'
   editable: true
+  url: 'https://maps.googleapis.com'
 }
 
 // this function is still present in the library to be retrocompatible with version < 1.1.0
