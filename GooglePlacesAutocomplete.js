@@ -81,7 +81,6 @@ export default class GooglePlacesAutocomplete extends Component {
   constructor (props) {
     super(props);
     this.state = this.getInitialState.call(this);
-    console.log('CHARLIE: CALLING URL', this.props.url)
   }
 
   getInitialState = () => ({
@@ -418,7 +417,7 @@ export default class GooglePlacesAutocomplete extends Component {
               }
           }
         } else {
-          // console.warn("google places autocomplete: request could not be completed or has been aborted");
+          console.warn("google places autocomplete: request could not be completed or has been aborted");
         }
       };
 
@@ -486,8 +485,7 @@ export default class GooglePlacesAutocomplete extends Component {
             }
           }
         } else {
-          // console.warn("google places autocomplete: request could not be completed or has been aborted");
-          console.log('CHARLIE: RESPONSE', request.responseText)
+          console.warn("google places autocomplete: request could not be completed or has been aborted");
         }
       };
       request.open('GET', this.props.url + '/place/autocomplete/json?&input=' + encodeURIComponent(text) + '&' + Qs.stringify(this.props.query));
@@ -763,9 +761,8 @@ GooglePlacesAutocomplete.propTypes = {
   suppressDefaultStyles: PropTypes.bool,
   numberOfLines: PropTypes.number,
   onSubmitEditing: PropTypes.func,
-  url: PropTypes.string
-  editable: PropTypes.bool
-  url: PropTypes.string
+  url: PropTypes.string,
+  editable: PropTypes.bool,
 }
 GooglePlacesAutocomplete.defaultProps = {
   placeholder: 'Search',
@@ -811,9 +808,8 @@ GooglePlacesAutocomplete.defaultProps = {
   suppressDefaultStyles: false,
   numberOfLines: 1,
   onSubmitEditing: () => {},
-  url: 'https://maps.googleapis.com'
-  editable: true
-  url: 'https://maps.googleapis.com'
+  url: 'https://maps.googleapis.com',
+  editable: true,
 }
 
 // this function is still present in the library to be retrocompatible with version < 1.1.0
