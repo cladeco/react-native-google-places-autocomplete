@@ -124,21 +124,26 @@ export default class GooglePlacesAutocomplete extends Component {
   componentDidMount() {
     // This will load the default value's search results after the view has
     // been rendered
-    this._onChangeText(this.state.text);
+    this._handleChangeText(this.state.text);
     this._isMounted = true;
   }
 
   componentWillReceiveProps(nextProps) {
+    let listViewDisplayed = true;
+
     if (nextProps.listViewDisplayed !== 'auto') {
-      this.setState({
-        listViewDisplayed: nextProps.listViewDisplayed,
-      });
+      listViewDisplayed = nextProps.listViewDisplayed;
     }
 
-    if(typeof(nextProps.text) !== "undefined" && this.state.text !== nextProps.text) {
+    if (typeof (nextProps.text) !== "undefined" && this.state.text !== nextProps.text) {
       this.setState({
-        listViewDisplayed:true
-      }, this._handleChangeText(nextProps.text));
+          listViewDisplayed: listViewDisplayed
+        },
+        this._handleChangeText(nextProps.text));
+    } else {
+      this.setState({
+        listViewDisplayed: listViewDisplayed
+      });
     }
   }
 
@@ -269,11 +274,10 @@ export default class GooglePlacesAutocomplete extends Component {
               'google places autocomplete: request could not be completed or has been aborted'
             );
           } else {
-            this.props.onFail();
+            this.props.onFail('request could not be completed or has been aborted');
           }
         }
       };
-
       request.open('GET', this.props.url + '/place/details/json?' + Qs.stringify({
         key: this.props.query.key,
         placeid: rowData.place_id,
@@ -406,15 +410,18 @@ export default class GooglePlacesAutocomplete extends Component {
             }
           }
           if (typeof responseJSON.error_message !== 'undefined') {
-            console.warn('google places autocomplete: ' + responseJSON.error_message);
+              if(!this.props.onFail)
+                console.warn('google places autocomplete: ' + responseJSON.error_message);
+              else{
+                this.props.onFail(responseJSON.error_message)
+              }
           }
         } else {
-          // console.warn("google places autocomplete: request could not be completed or has been aborted");
+          console.warn("google places autocomplete: request could not be completed or has been aborted");
         }
       };
 
       let url = '';
-
       if (this.props.nearbyPlacesAPI === 'GoogleReverseGeocoding') {
         // your key must be allowed to use Google Maps Geocoding API
         url = this.props.url + '/geocode/json?' + Qs.stringify({
@@ -458,7 +465,6 @@ export default class GooglePlacesAutocomplete extends Component {
 
         if (request.status === 200) {
           const responseJSON = JSON.parse(request.responseText);
-
           if (typeof responseJSON.predictions !== 'undefined') {
             if (this._isMounted === true) {
               const results = this.props.nearbyPlacesAPI === 'GoogleReverseGeocoding'
@@ -472,13 +478,16 @@ export default class GooglePlacesAutocomplete extends Component {
             }
           }
           if (typeof responseJSON.error_message !== 'undefined') {
-            console.warn('google places autocomplete: ' + responseJSON.error_message);
+            if(!this.props.onFail)
+              console.warn('google places autocomplete: ' + responseJSON.error_message);
+            else{
+              this.props.onFail(responseJSON.error_message)
+            }
           }
         } else {
-          // console.warn("google places autocomplete: request could not be completed or has been aborted");
+          console.warn("google places autocomplete: request could not be completed or has been aborted");
         }
       };
-
       request.open('GET', this.props.url + '/place/autocomplete/json?&input=' + encodeURIComponent(text) + '&' + Qs.stringify(this.props.query));
       if (this.props.query.origin !== null) {
          request.setRequestHeader('Referer', this.props.query.origin)
@@ -613,7 +622,7 @@ export default class GooglePlacesAutocomplete extends Component {
       >
         <Image
           style={[this.props.suppressDefaultStyles ? {} : defaultStyles.powered, this.props.styles.powered]}
-          resizeMode={Image.resizeMode.contain}
+          resizeMode='contain'
           source={require('./images/powered_by_google_on_white.png')}
         />
       </View>
@@ -687,6 +696,7 @@ export default class GooglePlacesAutocomplete extends Component {
             {this._renderLeftButton()}
             <TextInput
               ref="textInput"
+              editable={this.props.editable}
               returnKeyType={this.props.returnKeyType}
               autoFocus={this.props.autoFocus}
               style={[this.props.suppressDefaultStyles ? {} : defaultStyles.textInput, this.props.styles.textInput]}
@@ -751,7 +761,8 @@ GooglePlacesAutocomplete.propTypes = {
   suppressDefaultStyles: PropTypes.bool,
   numberOfLines: PropTypes.number,
   onSubmitEditing: PropTypes.func,
-  url: PropTypes.string
+  url: PropTypes.string,
+  editable: PropTypes.bool,
 }
 GooglePlacesAutocomplete.defaultProps = {
   placeholder: 'Search',
@@ -797,7 +808,8 @@ GooglePlacesAutocomplete.defaultProps = {
   suppressDefaultStyles: false,
   numberOfLines: 1,
   onSubmitEditing: () => {},
-  url: 'https://maps.googleapis.com'
+  url: 'https://maps.googleapis.com',
+  editable: true,
 }
 
 // this function is still present in the library to be retrocompatible with version < 1.1.0
